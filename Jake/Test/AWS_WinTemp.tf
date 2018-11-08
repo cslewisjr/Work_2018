@@ -26,7 +26,7 @@ provider "aws" {
            
             tags {
             Name = "DEV_BUILD_TEST02"
-            Use = "TestServer01"
+            Use = "TestServer02"
         }
     }
     
