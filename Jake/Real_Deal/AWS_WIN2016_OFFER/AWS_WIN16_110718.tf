@@ -1,25 +1,5 @@
 /*AWS Provider Configuration
 */
-##################################################################################
-# VARIABLES
-##################################################################################
-
-variable "aws_access_key" {}
-variable "aws_secret_key" {}
-variable "private_key_path" {}
-variable "key_name" {
-  default = "TECHDEN_KEY"
-
-  }
-variable "network_address_space" {
-  default = "10.199.0.0/16"
-}
-variable "subnet1_address_space" {
-  default = "10.199.0.0/24"
-}
-variable "subnet2_address_space" {
-  default = "10.199.1.0/24"
-}
 
 ##################################################################################
 # PROVIDERS
@@ -130,6 +110,7 @@ resource "aws_security_group" "win16-sg" {
     resource "aws_instance" "Dev_Build_TEST01"{
 
         ami ="ami-0e28ec6753aeec976"
+        count = "${var.instance_count}"
         instance_type = "t2.micro"
         subnet_id     = "${aws_subnet.subnet1.id}"
         vpc_security_group_ids = ["${aws_security_group.win16-sg.id}"]
@@ -147,22 +128,23 @@ resource "aws_security_group" "win16-sg" {
     
 
     }
-        resource "aws_instance" "Dev_Build_TEST02"{
+#        resource "aws_instance" "Dev_Build_TEST02"{
+#
+ 
+ #       ami ="ami-0e28ec6753aeec976"
+  #      instance_type = "t2.micro"
+   #     subnet_id     = "${aws_subnet.subnet1.id}"
+    #    vpc_security_group_ids = ["${aws_security_group.win16-sg.id}"]
+    #    key_name        = "${var.key_name}"
+    #     
+  #      connection {
+  #  user        = "ec2-user"
+  #  private_key = "${file(var.private_key_path)}"
+ # }
 
-        ami ="ami-0e28ec6753aeec976"
-        instance_type = "t2.micro"
-        subnet_id     = "${aws_subnet.subnet1.id}"
-        vpc_security_group_ids = ["${aws_security_group.win16-sg.id}"]
-        key_name        = "${var.key_name}"
-         
-        connection {
-    user        = "ec2-user"
-    private_key = "${file(var.private_key_path)}"
-  }
-
-            tags {
-            Name = "DEV_BUILD_TEST02"
-            Use = "TestServer02"
-        }
-    }
+  #          tags {
+   #         Name = "DEV_BUILD_TEST02"
+    #        Use = "TestServer02"
+     #   }
+    #}
     
