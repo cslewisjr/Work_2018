@@ -111,7 +111,7 @@ resource "aws_security_group" "win16-sg" {
 
         ami ="ami-028779930ada5200c"
         count = "${var.instance_count}"
-        instance_type = "t2.small"
+        instance_type = "t2.micro"
         subnet_id     = "${aws_subnet.subnet1.id}"
         vpc_security_group_ids = ["${aws_security_group.win16-sg.id}"]
         key_name        = "${var.key_name}"
