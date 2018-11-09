@@ -1,5 +1,5 @@
-aws_access_key = "AKIAJ3NY3EXOU7F2AFSA"
+aws_access_key = ""
 
-aws_secret_key = "U/YPJ8Vdg7i11YBAeYBBtUEaztsGFGZmB0AE+Zyu"
+aws_secret_key = ""
 
-private_key_path = "C:\\Users\\fatal_000\\Documents\\Tools\\keys\\AWS_2016_Build.pem"
+private_key_path = ""
