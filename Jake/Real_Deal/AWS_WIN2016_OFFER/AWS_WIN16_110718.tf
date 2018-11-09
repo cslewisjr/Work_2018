@@ -109,9 +109,9 @@ resource "aws_security_group" "win16-sg" {
 # INSTANCES #
     resource "aws_instance" "Dev_Build_TEST01"{
 
-        ami ="ami-0e28ec6753aeec976"
+        ami ="ami-028779930ada5200c"
         count = "${var.instance_count}"
-        instance_type = "t2.micro"
+        instance_type = "t2.small"
         subnet_id     = "${aws_subnet.subnet1.id}"
         vpc_security_group_ids = ["${aws_security_group.win16-sg.id}"]
         key_name        = "${var.key_name}"
