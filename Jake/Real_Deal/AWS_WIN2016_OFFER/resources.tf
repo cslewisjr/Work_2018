@@ -50,7 +50,7 @@ resource "aws_subnet" "subnet" {
 }
 
 # ROUTING #
-resource "aws_route_table" "rtb" {
+/*resource "aws_route_table" "rtb" {
   vpc_id = "${aws_vpc.vpc.id}"
 
   route {
@@ -63,12 +63,12 @@ resource "aws_route_table" "rtb" {
   }
 }
 
-resource "aws_route_table_association" "rta-subnet" {
+resource "aws_route_table_association" "rtb-subnet" {
   count = "${var.subnet_count}"  
-  subnet_id      = "${aws_subnet.subnet1.id}"
+  subnet_id      = "${aws_subnet.subnet.id}"
   route_table_id = "${aws_route_table.rtb.id}"
 }
-
+*/
 }
 # SECURITY GROUPS #
 # Windows security group 
@@ -143,7 +143,7 @@ resource "aws_elb" "web" {
 
   subnets         = ["${aws_subnet.subnet.*.id}"]
   security_groups = ["${aws_security_group.elb-sg.id}"]
-  instances       = ["${aws_instance.win16.*.id}"]
+  instances       = ["${aws_instance.nginx.*.id}"]
 
   listener {
     instance_port     = 80
