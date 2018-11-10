@@ -11,12 +11,16 @@ variable "key_name" {
 variable "network_address_space" {
   default = "10.199.0.0/16"
 }
-variable "subnet1_address_space" {
-  default = "10.199.0.0/24"
-}
-variable "subnet2_address_space" {
-  default = "10.199.1.0/24"
-}
+variable "environment_tag" {}
+variable "bucket_name" {}
+
+variable "arm_subscription_id" {}
+variable "arm_principal" {}
+variable "arm_password" {}
+variable "tenant_id" {}
+variable "dns_zone_name" {}
+variable "dns_resource_group" {}
+variable "dns_site_name" {}
 
 variable "instance_count" {
   default = 4
