@@ -6,7 +6,7 @@ variable "aws_access_key" {}
 variable "aws_secret_key" {}
 variable "private_key_path" {}
 variable "key_name" {
-  default = "AWS_2016_Build"
+  default = "AWS_2016_Buildv1"
 }
 variable "network_address_space" {
   default = "10.199.0.0/16"
