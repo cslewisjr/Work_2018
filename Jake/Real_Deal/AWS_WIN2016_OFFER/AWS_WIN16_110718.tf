@@ -107,11 +107,12 @@ resource "aws_security_group" "win16-sg" {
   }
 }
 # INSTANCES #
-    resource "aws_instance" "Dev_Build_TEST01"{
+    resource "aws_instance" "example"{
 
         ami ="ami-028779930ada5200c"
         count = "${var.instance_count}"
         instance_type = "t2.micro"
+        tags { Name="${format("test-%01d",count.index+1)}" }
         subnet_id     = "${aws_subnet.subnet1.id}"
         vpc_security_group_ids = ["${aws_security_group.win16-sg.id}"]
         key_name        = "${var.key_name}"
@@ -121,11 +122,13 @@ resource "aws_security_group" "win16-sg" {
     private_key = "${file(var.private_key_path)}"
   }
 
-        tags {
-            Name = "DEV_BUILD_TEST01"
-            Use = "TestServer01"
-        }
-    
+ #       tags {
+  #          Name = "DEV_BUILD_TEST01"
+   #         Use = "TestServer01"
+    #    }
+    output "ip"{
+        value = "${aws_instance.example.*.public_ip}"
+    }
 
     }
 #        resource "aws_instance" "Dev_Build_TEST02"{

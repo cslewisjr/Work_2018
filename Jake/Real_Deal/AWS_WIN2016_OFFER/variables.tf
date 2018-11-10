@@ -19,7 +19,7 @@ variable "subnet2_address_space" {
 }
 
 variable "instance_count" {
-  default = 1
+  default = 3
 }
 
 variable "subnet_count" {
