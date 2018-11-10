@@ -107,12 +107,12 @@ resource "aws_security_group" "win16-sg" {
   }
 }
 # INSTANCES #
-    resource "aws_instance" "example"{
+    resource "aws_instance" "Test_"{
 
         ami ="ami-028779930ada5200c"
         count = "${var.instance_count}"
         instance_type = "t2.micro"
-        tags { Name="${format("test-%01d",count.index+1)}" }
+    tags { Name="${format("test-%01d",count.index+1)}" }
         subnet_id     = "${aws_subnet.subnet1.id}"
         vpc_security_group_ids = ["${aws_security_group.win16-sg.id}"]
         key_name        = "${var.key_name}"
@@ -122,32 +122,11 @@ resource "aws_security_group" "win16-sg" {
     private_key = "${file(var.private_key_path)}"
   }
 
- #       tags {
-  #          Name = "DEV_BUILD_TEST01"
-   #         Use = "TestServer01"
-    #    }
+      }
     output "ip"{
-        value = "${aws_instance.example.*.public_ip}"
+        value = "${aws_instance.Test_.*.public_ip}"
     }
 
-    }
-#        resource "aws_instance" "Dev_Build_TEST02"{
-#
- 
- #       ami ="ami-0e28ec6753aeec976"
-  #      instance_type = "t2.micro"
-   #     subnet_id     = "${aws_subnet.subnet1.id}"
-    #    vpc_security_group_ids = ["${aws_security_group.win16-sg.id}"]
-    #    key_name        = "${var.key_name}"
-    #     
-  #      connection {
-  #  user        = "ec2-user"
-  #  private_key = "${file(var.private_key_path)}"
- # }
+    
 
-  #          tags {
-   #         Name = "DEV_BUILD_TEST02"
-    #        Use = "TestServer02"
-     #   }
-    #}
     
