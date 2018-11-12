@@ -1,6 +1,3 @@
-/*AWS Provider Configuration
-*/
-
 ##################################################################################
 # PROVIDERS
 ##################################################################################
@@ -27,50 +24,80 @@ resource "aws_vpc" "vpc" {
   cidr_block = "${var.network_address_space}"
   enable_dns_hostnames = "true"
 
+    tag {
+        Name = "${var.environment_tag}-vpc"
+        Environment = "${var.environment_tag}"
+    }
+
 }
 
 resource "aws_internet_gateway" "igw" {
   vpc_id = "${aws_vpc.vpc.id}"
 
-}
 
-resource "aws_subnet" "subnet1" {
-  cidr_block        = "${var.subnet1_address_space}"
+  tags {
+    Name = "${var.environment_tag}-igw"
+       Environment = "${var.environment_tag}"
+  }
+
+resource "aws_subnet" "subnet" {
+  count = "${var.subnet_count}"  
+  cidr_block        = "${cidrsubnet(var.network_address_space, 8, count.index + 1)}"
   vpc_id            = "${aws_vpc.vpc.id}"
   map_public_ip_on_launch = "true"
-  availability_zone = "${data.aws_availability_zones.available.names[0]}"
-
-}
-
-resource "aws_subnet" "subnet2" {
-  cidr_block        = "${var.subnet2_address_space}"
-  vpc_id            = "${aws_vpc.vpc.id}"
-  map_public_ip_on_launch = "true"
-  availability_zone = "${data.aws_availability_zones.available.names[1]}"
+  availability_zone = "${data.aws_availability_zones.available.names[count.index]}"
 
 }
 
 # ROUTING #
-resource "aws_route_table" "rtb" {
+/*resource "aws_route_table" "rtb" {
   vpc_id = "${aws_vpc.vpc.id}"
 
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = "${aws_internet_gateway.igw.id}"
   }
+    tags {
+    Name = "${var.environment_tag}-rtb"
+    Environment = "${var.environment_tag}"
+  }
 }
 
-resource "aws_route_table_association" "rta-subnet1" {
-  subnet_id      = "${aws_subnet.subnet1.id}"
+resource "aws_route_table_association" "rtb-subnet" {
+  count = "${var.subnet_count}"  
+  subnet_id      = "${aws_subnet.subnet.id}"
   route_table_id = "${aws_route_table.rtb.id}"
 }
-
-resource "aws_route_table_association" "rta-subnet2" {
-  subnet_id      = "${aws_subnet.subnet2.id}"
-  route_table_id = "${aws_route_table.rtb.id}"
+*/
 }
 # SECURITY GROUPS #
 # Windows security group 
+resource "aws_security_group" "elb-sg" {
+  name        = "Win16_elb_sg"
+  vpc_id      = "${aws_vpc.vpc.id}"
+
+  #Allow HTTP from anywhere
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  #allow all outbound
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags {
+    Name = "${var.environment_tag}-elb-sg"
+    Environment = "${var.environment_tag}"
+  }
+
+}
 resource "aws_security_group" "win16-sg" {
   name        = "win16_sg"
   vpc_id      = "${aws_vpc.vpc.id}"
@@ -105,14 +132,40 @@ resource "aws_security_group" "win16-sg" {
       protocol  = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
   }
+    tags {
+    Name = "${var.environment_tag}-win16-sg"
+    Environment = "${var.environment_tag}"
+  }
+}
+# LOAD BALANCER #
+resource "aws_elb" "web" {
+  name = "${var.environment_tag}-win16-elb"
+
+  subnets         = ["${aws_subnet.subnet.*.id}"]
+  security_groups = ["${aws_security_group.elb-sg.id}"]
+  instances       = ["${aws_instance.nginx.*.id}"]
+
+  listener {
+    instance_port     = 80
+    instance_protocol = "http"
+    lb_port           = 80
+    lb_protocol       = "http"
+  }
+
+  tags {
+    Name = "${var.environment_tag}-elb"
+    Environment = "${var.environment_tag}"
+  }
+
 }
 # INSTANCES #
-    resource "aws_instance" "Dev_Build_TEST01"{
+    resource "aws_instance" "Test_"{
 
         ami ="ami-028779930ada5200c"
         count = "${var.instance_count}"
         instance_type = "t2.micro"
-        subnet_id     = "${aws_subnet.subnet1.id}"
+    tags { Name="${format("test-%01d",count.index+1)}" }
+        subnet_id     = "${element(aws_subnet.subnet.*.id,count.index % var.subnet_count)}"
         vpc_security_group_ids = ["${aws_security_group.win16-sg.id}"]
         key_name        = "${var.key_name}"
          
@@ -121,30 +174,4 @@ resource "aws_security_group" "win16-sg" {
     private_key = "${file(var.private_key_path)}"
   }
 
-        tags {
-            Name = "DEV_BUILD_TEST01"
-            Use = "TestServer01"
-        }
-    
-
-    }
-#        resource "aws_instance" "Dev_Build_TEST02"{
-#
- 
- #       ami ="ami-0e28ec6753aeec976"
-  #      instance_type = "t2.micro"
-   #     subnet_id     = "${aws_subnet.subnet1.id}"
-    #    vpc_security_group_ids = ["${aws_security_group.win16-sg.id}"]
-    #    key_name        = "${var.key_name}"
-    #     
-  #      connection {
-  #  user        = "ec2-user"
-  #  private_key = "${file(var.private_key_path)}"
- # }
-
-  #          tags {
-   #         Name = "DEV_BUILD_TEST02"
-    #        Use = "TestServer02"
-     #   }
-    #}
-    
+      }
